@@ -18,6 +18,9 @@
     #define GREEN 3
     #define BLU 4
     #define TAIL 5
+    #define TIMEOUT_HEADER 6
+    #define TIMEOUT_CONFIG 7
+    
 #endif
 
 /* [] END OF FILE */
