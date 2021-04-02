@@ -11,6 +11,9 @@
 */
 #include "project.h"
 #include "InterruptRoutines.h"
+#include "global_variables.h"
+
+volatile int state = IDLE;
 
 int main(void)
 {
@@ -21,10 +24,21 @@ int main(void)
     UART_Start();
     isrTIMER_StartEx(Custom_TIMER_OF_ISR);
     isrUART_StartEx(Custom_UART_RX_ISR);
+    
+    UART_PutString("Send A0 to change colors\n");
 
     for(;;)
     {
         /* Place your application code here. */
+        switch (state)
+        {
+            case TAIL:
+                //creazione source file per gestione PWM
+                //qua chiamo la funzione PWM
+                UART_PutString("Colors updated\n");
+                state = IDLE;
+                break;
+        }
     }
 }
 
