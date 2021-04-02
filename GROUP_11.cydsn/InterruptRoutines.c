@@ -53,9 +53,9 @@ CY_ISR(Custom_UART_RX_ISR)
     uint8_t received = UART_ReadRxData();
     
     // Keys receiving
-    if( received == 'v')
+    if(received == 'v')
     {
-        UART_PutString("RGB LED Program $$$\n");
+        UART_PutString("RGB LED Program $$$\n"); //che minchia fa?
     }
     
     // Management of different states
