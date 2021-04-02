@@ -34,6 +34,7 @@
 <wrkspc_dependency project="GROUP_08.cydsn\GROUP_08.cyprj" dependency="..\..\..\Libraries\AnnotationLibrary\AnnotationLibrary_lib\AnnotationLibrary_lib.cylib\AnnotationLibrary_lib.cyprj" />
 <wrkspc_dependency project="GROUP_09.cydsn\GROUP_09.cyprj" dependency="..\..\..\Libraries\AnnotationLibrary\AnnotationLibrary_lib\AnnotationLibrary_lib.cylib\AnnotationLibrary_lib.cyprj" />
 <wrkspc_dependency project="GROUP_10.cydsn\GROUP_10.cyprj" dependency="..\..\..\Libraries\AnnotationLibrary\AnnotationLibrary_lib\AnnotationLibrary_lib.cylib\AnnotationLibrary_lib.cyprj" />
+<wrkspc_dependency project="GROUP_11.cydsn\GROUP_11.cyprj" dependency="${CyRoot}\psoc\content\default\CyAnnotationLibrary\CyAnnotationLibrary.cylib\CyAnnotationLibrary.cyprj" />
 <wrkspc_dependency project="GROUP_11.cydsn\GROUP_11.cyprj" dependency="..\PSoC_AnnotationLibrary\AnnotationLibrary\AnnotationLibrary_lib\AnnotationLibrary_lib.cylib\AnnotationLibrary_lib.cyprj" />
 </wrkspc_dependencies>
 </CyGuid_dcbd9771-0334-43dc-9cc3-fe99dc3c5316>
