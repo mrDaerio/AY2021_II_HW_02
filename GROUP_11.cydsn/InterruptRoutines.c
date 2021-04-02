@@ -52,6 +52,12 @@ CY_ISR(Custom_UART_RX_ISR)
     /* ISR code goes here */
     uint8_t received = UART_ReadRxData();
     
+    // Keys receiving
+    if( received == 'v')
+    {
+        UART_PutString("RGB LED Program $$$\n");
+    }
+    
     // Management of different states
     switch (state){
         case IDLE:
