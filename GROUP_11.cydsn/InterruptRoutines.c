@@ -53,7 +53,7 @@ CY_ISR(Custom_UART_RX_ISR)
 {
     /* ISR code goes here */
     uint8_t received = UART_ReadRxData();
-    char messaggio[20];
+    //char messaggio[20];
     
     // Management of different states
     switch (state){
@@ -87,8 +87,7 @@ CY_ISR(Custom_UART_RX_ISR)
             }
             break;
         case HEADER:
-            /*------salva dato in variabile red--------*/
-            rgb_color.red = received;
+            rgb_color.red = received;  // Update red value
             UART_PutString("Received RED\n");
             state = RED;
             UART_PutString("Insert GREEN data\n");
@@ -96,8 +95,7 @@ CY_ISR(Custom_UART_RX_ISR)
             Timer_WriteCounter(TIMER_PERIOD); //Reset timer
             break;
         case RED:
-            /*------salva dato in variabile green--------*/
-            rgb_color.green = received;
+            rgb_color.green = received; // Update green value
             UART_PutString("Received GREEN\n");
             state = GREEN;
             UART_PutString("Insert BLU data\n");
@@ -105,8 +103,7 @@ CY_ISR(Custom_UART_RX_ISR)
             Timer_WriteCounter(TIMER_PERIOD); //Reset timer
             break;
         case GREEN:
-            /*------salva dato in variabile blue--------*/
-            rgb_color.blu = received;
+            rgb_color.blu = received;  // Update blu value
             UART_PutString("Received BLU\n");
             state = BLU;
             UART_PutString("Confirm your choice by inserting 0xC0\n");
