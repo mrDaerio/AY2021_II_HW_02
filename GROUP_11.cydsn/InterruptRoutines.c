@@ -51,18 +51,14 @@ CY_ISR(Custom_TIMER_OF_ISR)
 // ISR for the UART
 CY_ISR(Custom_UART_RX_ISR)
 {
-    /* ISR code goes here */
     uint8_t received;
-    char messaggio[20];
-    UART_PutString("Called interrupt\n");
+    char message[30];
     
-    
+    //Do if Buffer is non empty 
     while(UART_GetRxBufferSize()!=0) 
     {
-        UART_PutString("do started\n");
-        received = UART_ReadRxData();
-        sprintf (messaggio,"Buffer: %d received: %x\n",UART_GetRxBufferSize(),received);
-        UART_PutString(messaggio);
+        received = UART_ReadRxData(); //Read the data (Buffer shifts of 1 step)
+        
         // Management of different states
         switch (state){
             case IDLE:
@@ -70,20 +66,15 @@ CY_ISR(Custom_UART_RX_ISR)
                 if (received == 0xA0) //Start changing color
                 {
                     state = HEADER;
-                    //sprintf(messaggio,"Counter e' a %d\r\n",Timer_ReadCounter());
-                    //UART_PutString(messaggio);
                     UART_PutString("Insert RED data\n");
                     Timer_WriteCounter(TIMER_PERIOD); //Reset timer
-                    //sprintf(messaggio,"Counter ora e' a %d\r\n",Timer_ReadCounter());
-                    //UART_PutString(messaggio);
-                    
                 }
                 else if(received == 0xA1) // Setting timeout
                 {
                     state = TIMEOUT_HEADER;
                     UART_PutString("Insert new timeout value:\n");
                 }
-                else if (received == 'v') // connection command
+                else if (received == 'v') // Connection command
                 {
                     UART_PutString("RGB LED Program $$$"); //Connection echo
                 }
@@ -96,7 +87,8 @@ CY_ISR(Custom_UART_RX_ISR)
                 break;
             case HEADER:
                 rgb_color.red = received;  // Update red value
-                UART_PutString("Received RED\n");
+                sprintf(message, "Received RED value: %d\r\n", received);
+                UART_PutString(message);
                 state = RED;
                 UART_PutString("Insert GREEN data\n");
                 time_counter = 0;
@@ -104,7 +96,8 @@ CY_ISR(Custom_UART_RX_ISR)
                 break;
             case RED:
                 rgb_color.green = received; // Update green value
-                UART_PutString("Received GREEN\n");
+                sprintf(message, "Received GREEN value: %d\r\n", received);
+                UART_PutString(message);
                 state = GREEN;
                 UART_PutString("Insert BLU data\n");
                 time_counter = 0;
@@ -112,7 +105,8 @@ CY_ISR(Custom_UART_RX_ISR)
                 break;
             case GREEN:
                 rgb_color.blu = received;  // Update blu value
-                UART_PutString("Received BLU\n");
+                sprintf(message, "Received BLUE value: %d\r\n", received);
+                UART_PutString(message);
                 state = BLU;
                 UART_PutString("Confirm your choice by inserting 0xC0\n");
                 time_counter = 0;
