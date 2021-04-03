@@ -52,109 +52,119 @@ CY_ISR(Custom_TIMER_OF_ISR)
 CY_ISR(Custom_UART_RX_ISR)
 {
     /* ISR code goes here */
-    uint8_t received = UART_ReadRxData();
-    //char messaggio[20];
+    uint8_t received;
+    char messaggio[20];
+    UART_PutString("Called interrupt\n");
     
-    // Management of different states
-    switch (state){
-        case IDLE:
-            // Check received key
-            if (received == 0xA0) //Start changing color
-            {
-                state = HEADER;
-                //sprintf(messaggio,"Counter e' a %d\r\n",Timer_ReadCounter());
-                //UART_PutString(messaggio);
-                UART_PutString("Insert RED data\n");
+    
+    while(UART_GetRxBufferSize()!=0) 
+    {
+        UART_PutString("do started\n");
+        received = UART_ReadRxData();
+        sprintf (messaggio,"Buffer: %d received: %x\n",UART_GetRxBufferSize(),received);
+        UART_PutString(messaggio);
+        // Management of different states
+        switch (state){
+            case IDLE:
+                // Check received key
+                if (received == 0xA0) //Start changing color
+                {
+                    state = HEADER;
+                    //sprintf(messaggio,"Counter e' a %d\r\n",Timer_ReadCounter());
+                    //UART_PutString(messaggio);
+                    UART_PutString("Insert RED data\n");
+                    Timer_WriteCounter(TIMER_PERIOD); //Reset timer
+                    //sprintf(messaggio,"Counter ora e' a %d\r\n",Timer_ReadCounter());
+                    //UART_PutString(messaggio);
+                    
+                }
+                else if(received == 0xA1) // Setting timeout
+                {
+                    state = TIMEOUT_HEADER;
+                    UART_PutString("Insert new timeout value:\n");
+                }
+                else if (received == 'v') // connection command
+                {
+                    UART_PutString("RGB LED Program $$$"); //Connection echo
+                }
+                else
+                {
+                    UART_PutString("Data not accepted.\n");
+                    UART_PutString("To insert a color send 0xA0\n");
+                    UART_PutString("To set timeout send 0xA1\n");
+                }
+                break;
+            case HEADER:
+                rgb_color.red = received;  // Update red value
+                UART_PutString("Received RED\n");
+                state = RED;
+                UART_PutString("Insert GREEN data\n");
+                time_counter = 0;
                 Timer_WriteCounter(TIMER_PERIOD); //Reset timer
-                //sprintf(messaggio,"Counter ora e' a %d\r\n",Timer_ReadCounter());
-                //UART_PutString(messaggio);
-                
-            }
-            else if(received == 0xA1) // Setting timeout
-            {
-                state = TIMEOUT_HEADER;
-                UART_PutString("Insert new timeout value:\n");
-            }
-            else if (received == 'v') // connection command
-            {
-                UART_PutString("RGB LED Program $$$"); //Connection echo
-            }
-            else
-            {
-                UART_PutString("Data not accepted.\n");
-                UART_PutString("To insert a color send 0xA0\n");
-                UART_PutString("To set timeout send 0xA1\n");
-            }
-            break;
-        case HEADER:
-            rgb_color.red = received;  // Update red value
-            UART_PutString("Received RED\n");
-            state = RED;
-            UART_PutString("Insert GREEN data\n");
-            time_counter = 0;
-            Timer_WriteCounter(TIMER_PERIOD); //Reset timer
-            break;
-        case RED:
-            rgb_color.green = received; // Update green value
-            UART_PutString("Received GREEN\n");
-            state = GREEN;
-            UART_PutString("Insert BLU data\n");
-            time_counter = 0;
-            Timer_WriteCounter(TIMER_PERIOD); //Reset timer
-            break;
-        case GREEN:
-            rgb_color.blu = received;  // Update blu value
-            UART_PutString("Received BLU\n");
-            state = BLU;
-            UART_PutString("Confirm your choice by inserting 0xC0\n");
-            time_counter = 0;
-            Timer_WriteCounter(TIMER_PERIOD); //Reset timer
-            break;
-        case BLU:
-            //Check recived key
-            if (received == 0xC0) // Correct key --> see main.c
-            {
-                UART_PutString("Colors updated succesfully\n\n");
-                UART_PutString("Send 0xA0 to change colors\nSend 0xA1 to change Timeout\n");
-                state = TAIL;
-            }
-            else
-            {
-                UART_PutString("Data not accepted.\nConfirm by inserting 0xC0\n");
-            }
-            break;
-            
-        case TIMEOUT_HEADER:
-            // Timeout settings update
-            if(received > MIN_TIMEOUT-1 && received < MAX_TIMEOUT+1)
-            {
-                timeout_temp = received;
-                char inserted_number[20];
-                sprintf(inserted_number, "Inserted number: %d\r\n", timeout_temp);
-                UART_PutString(inserted_number);
+                break;
+            case RED:
+                rgb_color.green = received; // Update green value
+                UART_PutString("Received GREEN\n");
+                state = GREEN;
+                UART_PutString("Insert BLU data\n");
+                time_counter = 0;
+                Timer_WriteCounter(TIMER_PERIOD); //Reset timer
+                break;
+            case GREEN:
+                rgb_color.blu = received;  // Update blu value
+                UART_PutString("Received BLU\n");
+                state = BLU;
                 UART_PutString("Confirm your choice by inserting 0xC0\n");
-                state = TIMEOUT_CONFIG;
-            }
-            else
-            {
-                UART_PutString("Data not accepted.\nInsert a value between 1 and 20\n");
-            }
-            break;
-            
-        case TIMEOUT_CONFIG:
-            if(received == 0xC0)
-            {
-                state = IDLE;
-                timeout = timeout_temp;
-                UART_PutString("Timeout updated succesfully\n\n");
-                UART_PutString("Send 0xA0 to change colors\nSend 0xA1 to change Timeout\n");
-            }
-            else
-            {
-                UART_PutString("Data not accepted\nInsert 0xC0\n");
-            }
-            break;
-    }
-    
+                time_counter = 0;
+                Timer_WriteCounter(TIMER_PERIOD); //Reset timer
+                break;
+            case BLU:
+                //Check recived key
+                if (received == 0xC0) // Correct key --> see main.c
+                {
+                    UART_PutString("Colors updated succesfully\n\n");
+                    UART_PutString("Send 0xA0 to change colors\nSend 0xA1 to change Timeout\n");
+                    state = TAIL;
+                }
+                else
+                {
+                    UART_PutString("Data not accepted.\nConfirm by inserting 0xC0\n");
+                }
+                break;
+                
+            case TIMEOUT_HEADER:
+                // Timeout settings update
+                if(received > MIN_TIMEOUT-1 && received < MAX_TIMEOUT+1)
+                {
+                    timeout_temp = received;
+                    char inserted_number[20];
+                    sprintf(inserted_number, "Inserted number: %d\r\n", timeout_temp);
+                    UART_PutString(inserted_number);
+                    UART_PutString("Confirm your choice by inserting 0xC0\n");
+                    state = TIMEOUT_CONFIG;
+                }
+                else
+                {
+                    UART_PutString("Data not accepted.\nInsert a value between 1 and 20\n");
+                }
+                break;
+                
+            case TIMEOUT_CONFIG:
+                if(received == 0xC0)
+                {
+                    state = IDLE;
+                    timeout = timeout_temp;
+                    UART_PutString("Timeout updated succesfully\n\n");
+                    UART_PutString("Send 0xA0 to change colors\nSend 0xA1 to change Timeout\n");
+                }
+                else
+                {
+                    UART_PutString("Data not accepted\nInsert 0xC0\n");
+                }
+                break;
+        }
+        
+    };
+
 }
 /* [] END OF FILE */
