@@ -1,10 +1,12 @@
 /* ========================================
  *
- * 
+ * Group 11 - Comini, Di Liddo, Marelli
+ * LTEBS II 2021
+ * Assignment 2
+ * File RGBLedDriver.h
  *
  * ========================================
 */
-
 #ifndef __RGBLED_PWM_H
     #define __RGBLED_PWM_H
     
