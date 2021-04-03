@@ -4,6 +4,7 @@
  * LTEBS II 2021
  * Assignment 2
  * File InterruptRoutines.c
+ * source file for TIMER and UART interrupts definitions
  *
  * ========================================
 */
@@ -26,7 +27,14 @@ uint8_t time_counter = 0;
 
 extern color rgb_color;
 
-// ISR for the Timer
+/*******************************************************************************
+* Function Name: Custom_TIMER_OF_ISR
+********************************************************************************
+* Summary:
+*  A counter is updated at timer overflow, if the state variable is one of the
+*  intermediate states. If the counter reaches a timeout variable (between 1-20s)
+*  the state is reset to IDLE
+*******************************************************************************/
 CY_ISR(Custom_TIMER_OF_ISR)
 {
     /* ISR code goes here */
@@ -35,9 +43,9 @@ CY_ISR(Custom_TIMER_OF_ISR)
     if (state > IDLE && state < TAIL) // Control timeout
     {
         time_counter++;
-        char str[20];
-        sprintf(str, "Current time: %d\r\n", time_counter);
-        UART_PutString(str);
+        //char str[20];
+        //sprintf(str, "Current time: %d\r\n", time_counter);
+        //UART_PutString(str);
     }
     if (time_counter >= timeout) //Timeout overflow --> reset to IDLE
     {
@@ -48,7 +56,34 @@ CY_ISR(Custom_TIMER_OF_ISR)
     
 }
 
-// ISR for the UART
+/*******************************************************************************
+* Function Name: Custom_UART_RX_ISR
+********************************************************************************
+* Summary:
+*  When a serial byte is received, the interrupt checks the value of 'state'
+*  flag. 
+*
+*  To update the color of the RGB led, it must receive 5 consecutive bytes:
+*  [0xA0, R, G, B, 0xC0]
+*   -0xA0: header byte to initialize color change
+*   -R: value of red brightness (0-255)
+*   -G: value of green brightness (0-255)
+*   -B: value of blue brightness (0-255)
+*   -0xC0: tail byte, to confirm the color that will be set in the 'main' function
+*
+*  To update the counter timeout it must receive 3 bytes:
+*  [0xA1, T, 0xC0]
+*   -0xA1: header byte to initialize timeout change
+*   -T: value of counter timeout (1-20)
+*   -0xC0: tail byte to confirm timeout change
+*
+*  To connect to the application, while in IDLE state, if the UART receives 
+*  a character 'v' it must send back a response string:
+*  "RGB LED Program $$$"
+*
+*  The function sends error messages on the serial port for unexpected values
+*  and cycles until the UART buffer is empty
+*******************************************************************************/
 CY_ISR(Custom_UART_RX_ISR)
 {
     uint8_t received;
@@ -80,9 +115,9 @@ CY_ISR(Custom_UART_RX_ISR)
                 }
                 else
                 {
-                    UART_PutString("Data not accepted.\n");
-                    UART_PutString("To insert a color send 0xA0\n");
-                    UART_PutString("To set timeout send 0xA1\n");
+                    UART_PutString("Data not accepted.\n"
+                                   "To insert a color send 0xA0\n"
+                                   "To set timeout send 0xA1\n");
                 }
                 break;
             case HEADER:
@@ -116,8 +151,9 @@ CY_ISR(Custom_UART_RX_ISR)
                 //Check recived key
                 if (received == 0xC0) // Correct key --> see main.c
                 {
-                    UART_PutString("Colors updated succesfully\n\n");
-                    UART_PutString("Send 0xA0 to change colors\nSend 0xA1 to change Timeout\n");
+                    UART_PutString("Colors updated succesfully\n\n"
+                                   "Send 0xA0 to change colors\n"
+                                   "Send 0xA1 to change Timeout\n");
                     state = TAIL;
                 }
                 else
@@ -131,9 +167,8 @@ CY_ISR(Custom_UART_RX_ISR)
                 if(received > MIN_TIMEOUT-1 && received < MAX_TIMEOUT+1)
                 {
                     timeout_temp = received;
-                    char inserted_number[20];
-                    sprintf(inserted_number, "Inserted number: %d\r\n", timeout_temp);
-                    UART_PutString(inserted_number);
+                    sprintf(message, "Inserted number: %d\r\n", timeout_temp);
+                    UART_PutString(message);
                     UART_PutString("Confirm your choice by inserting 0xC0\n");
                     state = TIMEOUT_CONFIG;
                 }

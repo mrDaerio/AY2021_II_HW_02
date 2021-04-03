@@ -4,6 +4,7 @@
  * LTEBS II 2021
  * Assignment 2
  * File RGBLedDriver.c
+ * source file for RGB PWM control functions definitions
  *
  * ========================================
 */
@@ -14,20 +15,31 @@ static void RGBLED_WriteRed(uint8_t red);
 static void RGBLED_WriteGreen(uint8_t green);
 static void RGBLED_WriteBlu(uint8_t blu);
 
-volatile color rgb_color={0,0,0};
+volatile color rgb_color={0,0,0}; //global color variable
 
+/*******************************************************************************
+* Function Name: RGBLED_Start()
+********************************************************************************
+* Summary:
+*  Starts the two PWM peripherals for RGB control
+*******************************************************************************/
 void RGBLED_Start()
 {
     PWM_RG_Start();
     PWM_B_Start();
 }
 
-void RGBLED_Stop()
-{
-    PWM_RG_Stop();
-    PWM_B_Stop();
-}
-
+/*******************************************************************************
+* Function Name: RGBLED_WriteColor(color c)
+********************************************************************************
+* Summary:
+*  Given a color struct, sets the values of PWM to change the brightness of each
+*  color.
+*  
+* Parameters:
+*  color c: color struct containing the three values for red, green and blue.
+*           (defined in RGBLedDriver.h)
+*******************************************************************************/
 void RGBLED_WriteColor(color c)
 {
     RGBLED_WriteRed(c.red);
@@ -35,15 +47,43 @@ void RGBLED_WriteColor(color c)
     RGBLED_WriteBlu(c.blu);
 }
 
-static void RGBLED_WriteRed( uint8_t red)
+/*******************************************************************************
+* Function Name: RGBLED_WriteRed
+********************************************************************************
+* Summary:
+*  Internal function to set the red color of PWM
+*
+* Parameters:
+*  red: value for color red (0-255)
+*******************************************************************************/
+static void RGBLED_WriteRed(uint8_t red)
 {
     PWM_RG_WriteCompare1(red);
 }
 
+/*******************************************************************************
+* Function Name: RGBLED_WriteGreen
+********************************************************************************
+* Summary:
+*  Internal function to set the green color of PWM
+*
+* Parameters:
+*  green: value for color green (0-255)
+*******************************************************************************/
 static void RGBLED_WriteGreen(uint8_t green)
 {
     PWM_RG_WriteCompare2(green);
 }
+
+/*******************************************************************************
+* Function Name: RGBLED_WriteBlu
+********************************************************************************
+* Summary:
+*  Internal function to set the blue color of PWM
+*
+* Parameters:
+*  blu: value for color blue (0-255)
+*******************************************************************************/
 static void RGBLED_WriteBlu(uint8_t blu)
 {
     PWM_B_WriteCompare(blu);

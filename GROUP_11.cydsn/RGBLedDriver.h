@@ -4,6 +4,8 @@
  * LTEBS II 2021
  * Assignment 2
  * File RGBLedDriver.h
+ * header file for RGB PWM control functions declarations
+ * and color type definition
  *
  * ========================================
 */

@@ -4,6 +4,7 @@
  * LTEBS II 2021
  * Assignment 2
  * File InterruptRoutines.h
+ * header file for TIMER and UART interrupts declarations
  *
  * ========================================
 */

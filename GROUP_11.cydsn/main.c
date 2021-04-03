@@ -18,8 +18,7 @@ extern color rgb_color;
 int main(void)
 {
     CyGlobalIntEnable; /* Enable global interrupts. */
-
-    /* Place your initialization/startup code here (e.g. MyInst_Start()) */
+    
     Timer_Start();
     UART_Start();
     isrTIMER_StartEx(Custom_TIMER_OF_ISR);
@@ -30,12 +29,9 @@ int main(void)
 
     for(;;)
     {
-        /* Place your application code here. */
         switch (state)
         {
             case TAIL:
-                //creazione source file per gestione PWM
-                //qua chiamo la funzione PWM
                 RGBLED_WriteColor(rgb_color);
                 UART_PutString("Colors updated\n");
                 state = IDLE;
