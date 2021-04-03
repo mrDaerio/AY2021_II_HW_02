@@ -1,11 +1,5 @@
 /* ========================================
  *
- * Copyright YOUR COMPANY, THE YEAR
- * All Rights Reserved
- * UNPUBLISHED, LICENSED SOFTWARE.
- *
- * CONFIDENTIAL AND PROPRIETARY INFORMATION
- * WHICH IS THE PROPERTY OF your company.
  *
  * ========================================
 */
@@ -14,6 +8,7 @@
 #include "UART.h"
 #include "stdio.h"
 #include "global_variables.h"
+#include "RGBLedDriver.h"
 
 #define MIN_TIMEOUT 1 //Minimum value acceptable for timeout settings
 #define MAX_TIMEOUT 20 //Maximum value acceptable for timeout settings
@@ -24,6 +19,8 @@ extern int state; //Global variable
 uint8_t timeout = 5;
 uint8_t timeout_temp = 5;
 uint8_t time_counter = 0;
+
+extern color rgb_color;
 
 // ISR for the Timer
 CY_ISR(Custom_TIMER_OF_ISR)
@@ -87,6 +84,7 @@ CY_ISR(Custom_UART_RX_ISR)
             break;
         case HEADER:
             /*------salva dato in variabile red--------*/
+            rgb_color.red = received;
             UART_PutString("Received RED\n");
             state = RED;
             UART_PutString("Insert GREEN data\n");
@@ -95,6 +93,7 @@ CY_ISR(Custom_UART_RX_ISR)
             break;
         case RED:
             /*------salva dato in variabile green--------*/
+            rgb_color.green = received;
             UART_PutString("Received GREEN\n");
             state = GREEN;
             UART_PutString("Insert BLU data\n");
@@ -103,6 +102,7 @@ CY_ISR(Custom_UART_RX_ISR)
             break;
         case GREEN:
             /*------salva dato in variabile blue--------*/
+            rgb_color.blu = received;
             UART_PutString("Received BLU\n");
             state = BLU;
             UART_PutString("Confirm your choice by inserting 0xC0\n");
