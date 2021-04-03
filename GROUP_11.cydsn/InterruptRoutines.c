@@ -17,6 +17,7 @@
 
 #define MIN_TIMEOUT 1 //Minimum value acceptable for timeout settings
 #define MAX_TIMEOUT 20 //Maximum value acceptable for timeout settings
+#define TIMER_PERIOD 1000
 
 extern int state; //Global variable
 
@@ -51,12 +52,7 @@ CY_ISR(Custom_UART_RX_ISR)
 {
     /* ISR code goes here */
     uint8_t received = UART_ReadRxData();
-    
-    // Keys receiving
-    if(received == 'v')
-    {
-        UART_PutString("RGB LED Program $$$\n"); //che minchia fa?
-    }
+    char messaggio[20];
     
     // Management of different states
     switch (state){
@@ -65,12 +61,22 @@ CY_ISR(Custom_UART_RX_ISR)
             if (received == 0xA0) //Start changing color
             {
                 state = HEADER;
+                //sprintf(messaggio,"Counter e' a %d\r\n",Timer_ReadCounter());
+                //UART_PutString(messaggio);
                 UART_PutString("Insert RED data\n");
+                Timer_WriteCounter(TIMER_PERIOD); //Reset timer
+                //sprintf(messaggio,"Counter ora e' a %d\r\n",Timer_ReadCounter());
+                //UART_PutString(messaggio);
+                
             }
             else if(received == 0xA1) // Setting timeout
             {
                 state = TIMEOUT_HEADER;
                 UART_PutString("Insert new timeout value:\n");
+            }
+            else if (received == 'v') // connection command
+            {
+                UART_PutString("RGB LED Program $$$"); //Connection echo
             }
             else
             {
@@ -85,6 +91,7 @@ CY_ISR(Custom_UART_RX_ISR)
             state = RED;
             UART_PutString("Insert GREEN data\n");
             time_counter = 0;
+            Timer_WriteCounter(TIMER_PERIOD); //Reset timer
             break;
         case RED:
             /*------salva dato in variabile green--------*/
@@ -92,6 +99,7 @@ CY_ISR(Custom_UART_RX_ISR)
             state = GREEN;
             UART_PutString("Insert BLU data\n");
             time_counter = 0;
+            Timer_WriteCounter(TIMER_PERIOD); //Reset timer
             break;
         case GREEN:
             /*------salva dato in variabile blue--------*/
@@ -99,6 +107,7 @@ CY_ISR(Custom_UART_RX_ISR)
             state = BLU;
             UART_PutString("Confirm your choice by inserting 0xC0\n");
             time_counter = 0;
+            Timer_WriteCounter(TIMER_PERIOD); //Reset timer
             break;
         case BLU:
             //Check recived key
@@ -124,7 +133,6 @@ CY_ISR(Custom_UART_RX_ISR)
                 UART_PutString(inserted_number);
                 UART_PutString("Confirm your choice by inserting 0xC0\n");
                 state = TIMEOUT_CONFIG;
-                time_counter = 0;
             }
             else
             {
