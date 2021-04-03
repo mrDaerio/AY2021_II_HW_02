@@ -1,6 +1,9 @@
 /* ========================================
  *
- * 
+ * Group 11 - Comini, Di Liddo, Marelli
+ * LTEBS II 2021
+ * Assignment 2
+ * File main.c
  *
  * ========================================
 */
@@ -21,6 +24,7 @@ int main(void)
     UART_Start();
     isrTIMER_StartEx(Custom_TIMER_OF_ISR);
     isrUART_StartEx(Custom_UART_RX_ISR);
+    RGBLED_Start();
     
     UART_PutString("Send 0xA0 to change colors\nSend 0xA1 to change Timeout\n");
 
@@ -32,6 +36,7 @@ int main(void)
             case TAIL:
                 //creazione source file per gestione PWM
                 //qua chiamo la funzione PWM
+                RGBLED_WriteColor(rgb_color);
                 UART_PutString("Colors updated\n");
                 state = IDLE;
                 break;
