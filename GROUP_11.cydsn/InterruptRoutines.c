@@ -104,6 +104,7 @@ CY_ISR(Custom_UART_RX_ISR)
                 {
                     state = HEADER;
                     UART_PutString("Insert RED data\n");
+                    time_counter = 0;
                     Timer_WriteCounter(TIMER_PERIOD); //Reset timer
                 }
                 else if(received == TIMEOUT_HEADER_CMD) // Setting timeout
