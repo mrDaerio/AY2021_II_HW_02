@@ -153,9 +153,7 @@ CY_ISR(Custom_UART_RX_ISR)
                 //Check recived key
                 if (received == TAIL_CMD) // Correct key --> see main.c
                 {
-                    UART_PutString("Colors updated succesfully\n\n"
-                                   "Send 0xA0 to change colors\n"
-                                   "Send 0xA1 to change Timeout\n");
+                    UART_PutString("Tail byte received\n");
                     state = TAIL;
                 }
                 else

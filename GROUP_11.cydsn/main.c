@@ -33,7 +33,9 @@ int main(void)
         {
             case TAIL:
                 RGBLED_WriteColor(rgb_color);
-                UART_PutString("Colors updated\n");
+                UART_PutString("Colors updated\n\n"
+                               "Send 0xA0 to change colors\n"
+                               "Send 0xA1 to change Timeout\n");
                 state = IDLE;
                 break;
         }
