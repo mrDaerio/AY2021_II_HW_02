@@ -17,12 +17,15 @@
 
 #define MIN_TIMEOUT 1 //Minimum value acceptable for timeout settings
 #define MAX_TIMEOUT 20 //Maximum value acceptable for timeout settings
-#define TIMER_PERIOD 1000
+#define TIMER_PERIOD 999
+#define DEFAULT_TIMEOUT 5
+
+#define MESSAGES_LEN 30
 
 extern int state; //Global variable
 
-uint8_t timeout = 5;
-uint8_t timeout_temp = 5;
+uint8_t timeout = DEFAULT_TIMEOUT;
+uint8_t timeout_temp = DEFAULT_TIMEOUT;
 uint8_t time_counter = 0;
 
 extern color rgb_color;
@@ -37,15 +40,14 @@ extern color rgb_color;
 *******************************************************************************/
 CY_ISR(Custom_TIMER_OF_ISR)
 {
-    /* ISR code goes here */
     Timer_ReadStatusRegister(); // Clears interrupt
     
     if (state > IDLE && state < TAIL) // Control timeout
     {
         time_counter++;
-        char str[20];
-        sprintf(str, "Current time: %d\r\n", time_counter);
-        UART_PutString(str);
+        //char str[20];
+        //sprintf(str, "Current time: %d\r\n", time_counter);
+        //UART_PutString(str);
     }
     if (time_counter >= timeout) //Timeout overflow --> reset to IDLE
     {
@@ -87,7 +89,7 @@ CY_ISR(Custom_TIMER_OF_ISR)
 CY_ISR(Custom_UART_RX_ISR)
 {
     uint8_t received;
-    char message[30];
+    char message[MESSAGES_LEN];
     
     //Do if Buffer is non empty 
     while(UART_GetRxBufferSize()!=0) 
@@ -98,19 +100,18 @@ CY_ISR(Custom_UART_RX_ISR)
         switch (state){
             case IDLE:
                 // Check received key
-                if (received == 0xA0) //Start changing color
+                if (received == HEADER_CMD) //Start changing color
                 {
                     state = HEADER;
                     UART_PutString("Insert RED data\n");
                     Timer_WriteCounter(TIMER_PERIOD); //Reset timer
-                    CyDelay(7000);
                 }
-                else if(received == 0xA1) // Setting timeout
+                else if(received == TIMEOUT_HEADER_CMD) // Setting timeout
                 {
                     state = TIMEOUT_HEADER;
                     UART_PutString("Insert new timeout value:\n");
                 }
-                else if (received == 'v') // Connection command
+                else if (received == CONNECTION_CMD) // Connection command
                 {
                     UART_PutString("RGB LED Program $$$"); //Connection echo
                 }
@@ -150,7 +151,7 @@ CY_ISR(Custom_UART_RX_ISR)
                 break;
             case BLU:
                 //Check recived key
-                if (received == 0xC0) // Correct key --> see main.c
+                if (received == TAIL_CMD) // Correct key --> see main.c
                 {
                     UART_PutString("Colors updated succesfully\n\n"
                                    "Send 0xA0 to change colors\n"
@@ -180,7 +181,7 @@ CY_ISR(Custom_UART_RX_ISR)
                 break;
                 
             case TIMEOUT_CONFIG:
-                if(received == 0xC0)
+                if(received == TAIL_CMD)
                 {
                     state = IDLE;
                     timeout = timeout_temp;
