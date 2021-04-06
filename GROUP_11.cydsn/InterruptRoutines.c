@@ -43,9 +43,9 @@ CY_ISR(Custom_TIMER_OF_ISR)
     if (state > IDLE && state < TAIL) // Control timeout
     {
         time_counter++;
-        //char str[20];
-        //sprintf(str, "Current time: %d\r\n", time_counter);
-        //UART_PutString(str);
+        char str[20];
+        sprintf(str, "Current time: %d\r\n", time_counter);
+        UART_PutString(str);
     }
     if (time_counter >= timeout) //Timeout overflow --> reset to IDLE
     {
@@ -103,6 +103,7 @@ CY_ISR(Custom_UART_RX_ISR)
                     state = HEADER;
                     UART_PutString("Insert RED data\n");
                     Timer_WriteCounter(TIMER_PERIOD); //Reset timer
+                    CyDelay(7000);
                 }
                 else if(received == 0xA1) // Setting timeout
                 {
