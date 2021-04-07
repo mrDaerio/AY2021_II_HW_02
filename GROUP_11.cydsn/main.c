@@ -13,19 +13,21 @@
 #include "RGBLedDriver.h"
 
 volatile int state = IDLE;
-extern color rgb_color;
 
 int main(void)
 {
     CyGlobalIntEnable; /* Enable global interrupts. */
     
+    // Peripherals start
     Timer_Start();
     UART_Start();
-    isrTIMER_StartEx(Custom_TIMER_OF_ISR);
-    isrUART_StartEx(Custom_UART_RX_ISR);
     RGBLED_Start();
     
-    UART_PutString("Send 0xA0 to change colors\nSend 0xA1 to change Timeout\n");
+    // ISR init. of our custom functions
+    isrTIMER_StartEx(Custom_TIMER_OF_ISR);
+    isrUART_StartEx(Custom_UART_RX_ISR);
+    
+    UART_PutString("\fSend 0xA0 to change colors\nSend 0xA1 to change Timeout\n");
 
     for(;;)
     {
@@ -33,7 +35,7 @@ int main(void)
         {
             case TAIL:
                 RGBLED_WriteColor(rgb_color);
-                UART_PutString("Colors updated\n\n"
+                UART_PutString("\fColors updated\n\n"
                                "Send 0xA0 to change colors\n"
                                "Send 0xA1 to change Timeout\n");
                 state = IDLE;

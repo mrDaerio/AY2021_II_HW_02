@@ -28,7 +28,6 @@ uint8_t timeout = DEFAULT_TIMEOUT;
 uint8_t timeout_temp = DEFAULT_TIMEOUT;
 uint8_t time_counter = 0;
 
-extern color rgb_color;
 
 /*******************************************************************************
 * Function Name: Custom_TIMER_OF_ISR
@@ -53,7 +52,7 @@ CY_ISR(Custom_TIMER_OF_ISR)
     {
         UART_PutString("Time is up! Returning to IDLE\n");
         state = IDLE;
-        time_counter = 0;
+        TimerReset();
     }
     
 }
@@ -104,8 +103,7 @@ CY_ISR(Custom_UART_RX_ISR)
                 {
                     state = HEADER;
                     UART_PutString("Insert RED data\n");
-                    time_counter = 0;
-                    Timer_WriteCounter(TIMER_PERIOD); //Reset timer
+                    TimerReset();
                 }
                 else if(received == TIMEOUT_HEADER_CMD) // Setting timeout
                 {
@@ -129,8 +127,7 @@ CY_ISR(Custom_UART_RX_ISR)
                 UART_PutString(message);
                 state = RED;
                 UART_PutString("Insert GREEN data\n");
-                time_counter = 0;
-                Timer_WriteCounter(TIMER_PERIOD); //Reset timer
+                TimerReset();
                 break;
             case RED:
                 rgb_color.green = received; // Update green value
@@ -147,8 +144,7 @@ CY_ISR(Custom_UART_RX_ISR)
                 UART_PutString(message);
                 state = BLU;
                 UART_PutString("Confirm your choice by inserting 0xC0\n");
-                time_counter = 0;
-                Timer_WriteCounter(TIMER_PERIOD); //Reset timer
+                TimerReset();
                 break;
             case BLU:
                 //Check recived key
@@ -184,7 +180,7 @@ CY_ISR(Custom_UART_RX_ISR)
                 {
                     state = IDLE;
                     timeout = timeout_temp;
-                    UART_PutString("Timeout updated succesfully\n\n");
+                    UART_PutString("\fTimeout updated succesfully\n\n");
                     UART_PutString("Send 0xA0 to change colors\nSend 0xA1 to change Timeout\n");
                 }
                 else
@@ -196,5 +192,16 @@ CY_ISR(Custom_UART_RX_ISR)
         
     };
 
+}
+
+/*******************************************************************************
+* Function Name: TimerReset
+********************************************************************************
+* Summary: reset timer and counter variable
+*******************************************************************************/
+void TimerReset()
+{
+    time_counter = 0;
+    Timer_WriteCounter(TIMER_PERIOD);
 }
 /* [] END OF FILE */

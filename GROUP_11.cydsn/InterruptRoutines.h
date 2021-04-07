@@ -12,6 +12,8 @@
     
     #include "cytypes.h"
     
+    void TimerReset(void);
+    
     CY_ISR_PROTO(Custom_UART_RX_ISR);
     CY_ISR_PROTO(Custom_TIMER_OF_ISR);
 
