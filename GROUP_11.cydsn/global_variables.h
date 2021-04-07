@@ -15,6 +15,9 @@
     #include "stdio.h"
     #include "cytypes.h"
     
+    //maximum length of sprintf strings
+    #define MESSAGES_LEN 100
+
     // Color change states
     #define IDLE 0 
     #define HEADER 1
