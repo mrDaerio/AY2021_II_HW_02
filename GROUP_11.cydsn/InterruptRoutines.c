@@ -8,25 +8,22 @@
  *
  * ========================================
 */
-#include "project.h"
+
 #include "InterruptRoutines.h"
-#include "UART.h"
-#include "stdio.h"
-#include "global_variables.h"
-#include "RGBLedDriver.h"
 
 #define MIN_TIMEOUT 1 //Minimum value acceptable for timeout settings
 #define MAX_TIMEOUT 20 //Maximum value acceptable for timeout settings
-#define TIMER_PERIOD 999
-#define DEFAULT_TIMEOUT 5
+
+#define TIMER_PERIOD 999 //Reset value for Timer's internal counter
 
 #define MESSAGES_LEN 30
 
-extern int state; //Global variable
+#define DEFAULT_TIMEOUT 5 //Default timeout for intermediate states (5s) before state reset to IDLE
 
-uint8_t timeout = DEFAULT_TIMEOUT;
-uint8_t timeout_temp = DEFAULT_TIMEOUT;
-uint8_t time_counter = 0;
+uint8_t timeout = DEFAULT_TIMEOUT; //timeout initialization
+uint8_t timeout_temp = DEFAULT_TIMEOUT; //initialization for timeout configuration temporary variable
+
+uint8_t time_counter = 0; //counter for time (in seconds)
 
 
 /*******************************************************************************

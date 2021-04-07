@@ -10,7 +10,7 @@
 #ifndef __INTERRUPT_ROUTINES_H
     #define __INTERRUPT_ROUTINES_H
     
-    #include "cytypes.h"
+    #include "global_variables.h"
     
     void TimerReset(void);
     

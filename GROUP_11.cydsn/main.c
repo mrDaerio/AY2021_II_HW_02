@@ -7,12 +7,10 @@
  *
  * ========================================
 */
-#include "project.h"
-#include "InterruptRoutines.h"
-#include "global_variables.h"
-#include "RGBLedDriver.h"
 
-volatile int state = IDLE;
+#include "global_variables.h"
+#include "InterruptRoutines.h"
+#include "RGBLedDriver.h"
 
 int main(void)
 {
@@ -27,11 +25,16 @@ int main(void)
     isrTIMER_StartEx(Custom_TIMER_OF_ISR);
     isrUART_StartEx(Custom_UART_RX_ISR);
     
-    UART_PutString("\fSend 0xA0 to change colors\nSend 0xA1 to change Timeout\n");
+    //initialize state variable to IDLE
+    state = IDLE;
     
+    //initialize color variable to black (0,0,0);
     rgb_color.red = 0;
     rgb_color.green = 0; 
     rgb_color.blu = 0;
+    
+    //Message confirming program has started
+    UART_PutString("\fSend 0xA0 to change colors\nSend 0xA1 to change Timeout\n");
     
     for(;;)
     {
