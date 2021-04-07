@@ -28,7 +28,11 @@ int main(void)
     isrUART_StartEx(Custom_UART_RX_ISR);
     
     UART_PutString("\fSend 0xA0 to change colors\nSend 0xA1 to change Timeout\n");
-
+    
+    rgb_color.red = 0;
+    rgb_color.green = 0; 
+    rgb_color.blu = 0;
+    
     for(;;)
     {
         switch (state)

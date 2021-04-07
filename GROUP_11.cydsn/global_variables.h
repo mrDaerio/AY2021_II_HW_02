@@ -33,7 +33,7 @@
     // Connection for the 'rgbcontrol.exe'
     #define CONNECTION_CMD 'v'
     
-    volatile color rgb_color={0,0,0}; //global color variable
+    volatile color rgb_color; //global color variable
     
 #endif
 
