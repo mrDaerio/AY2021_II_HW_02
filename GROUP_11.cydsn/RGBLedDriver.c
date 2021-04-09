@@ -15,7 +15,6 @@ static void RGBLED_WriteRed(uint8_t red);
 static void RGBLED_WriteGreen(uint8_t green);
 static void RGBLED_WriteBlu(uint8_t blu);
 
-volatile color rgb_color={0,0,0}; //global color variable
 
 /*******************************************************************************
 * Function Name: RGBLED_Start()
