@@ -23,7 +23,6 @@ uint8_t timeout_temp = DEFAULT_TIMEOUT; //initialization for timeout configurati
 
 uint8_t time_counter = 0; //counter for time (in seconds)
 
-
 /*******************************************************************************
 * Function Name: Custom_TIMER_OF_ISR
 ********************************************************************************
